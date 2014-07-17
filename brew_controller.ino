@@ -26,23 +26,25 @@
 
 Adafruit_ST7735 tft = Adafruit_ST7735(cs, dc, mosi, sclk, rst);
 
-float p = 3.1415926;
-
 int currentCol = 0;
 int currentRow = 0;
 int prevCol = 0;
 int prevRow = 0;
 
-int setHLT = 160;
-int setRIMS = 160;
+int setHLT = 150;
+int setRIMS = 150;
 int setBK = 100;
 
-int currHLT = 161;
-int currRIMS = 162;
+int currHLT = 150;
+int currRIMS = 151;
 
 boolean paused = true;
 int mode = 0;
 int prevmode = 0;
+
+const int window = 5000; //Time in milliseconds to calculate duty cycle
+long previousMillis = 0;
+boolean BKon = false;
  
 #define Neutral 0
 #define Press 1
@@ -77,6 +79,7 @@ void elementOn(int element)
       break;
     case 2:
       tft.fillCircle(125, 8, 5, RED);
+      BKon = true;
       break;
   }
 }
@@ -94,6 +97,7 @@ void elementOff(int element)
       break;
     case 2:
       tft.fillCircle(125, 8, 5, BLACK);
+      BKon = false;
       break;
   }
 }
@@ -268,6 +272,7 @@ void setPaused(boolean value)
     tft.setTextColor(RED, BLACK);
     tft.setCursor(10, 80);
     tft.print("PAUSED");
+    elementOff(2);
   }
   else
   {
@@ -531,8 +536,34 @@ void loop() {
       break;
     case 2:
       //firing BK only
+      unsigned long currentMillis = millis();
+      float setBKpct = setBK / 100.0;
+      float onDuration = (float)window * setBKpct;
+      float offDuration = (float)window - onDuration;   
+      
+      if (!paused)
+      {
+        if (BKon)
+        {
+          if (currentMillis - previousMillis > (long)onDuration)
+          {
+            previousMillis = currentMillis;
+            elementOff(2);
+          }
+        }
+        else
+        {
+          if (currentMillis - previousMillis > (long)offDuration)
+          {
+            previousMillis = currentMillis;
+            elementOn(2);
+          }
+        }
+      }
+      
       break;
   }
+  
   
   //turn off elements regardless of mode
 
