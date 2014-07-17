@@ -1,4 +1,4 @@
-shiny-octo-avenger
+brew_controller
 ==================
 Repo for arduino code for my brewery controller (RIMS process).
 
