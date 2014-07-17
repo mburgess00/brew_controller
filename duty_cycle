@@ -1,0 +1,14 @@
+const int window = 2000; //Time in milliseconds to calculate duty cycle over
+unsigned long currentMillis = 0;
+unsigned long lastchange = 0;
+setBK = 75; //dummy for example purposes
+
+//calculate on and off duration in milliseconds
+int onDuration = 0;
+int offDuration = 0;
+float setBKpct = 0;
+
+setBKpct = setBK / 100;
+onDuration = window * setBKpct;
+offDuration = window - onDuration;
+
