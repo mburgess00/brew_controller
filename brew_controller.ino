@@ -5,6 +5,15 @@
 #define dc   8
 #define rst  0  // you can also connect this to the Arduino reset
 
+#define thermoDO 3
+#define thermoCLK 4
+#define HLTthermoCS 5
+#define RIMSthermoCS 6
+
+#define HLTSSR A0
+#define RIMSSSR A1
+#define BKSSR A2
+
 #include <Adafruit_GFX.h>    // Core graphics library
 #include <Adafruit_ST7735.h> // Hardware-specific library
 #include <SPI.h>
@@ -73,12 +82,15 @@ void elementOn(int element)
   {
     case 0:
       tft.fillCircle(25, 8, 5, RED);
+      digitalWrite(HLTSSR, HIGH);
       break;
     case 1:
       tft.fillCircle(75, 8, 5, RED);
+      digitalWrite(RIMSSSR, HIGH);
       break;
     case 2:
       tft.fillCircle(125, 8, 5, RED);
+      digitalWrite(BKSSR, HIGH);
       BKon = true;
       break;
   }
@@ -91,12 +103,15 @@ void elementOff(int element)
   {
     case 0:
       tft.fillCircle(25, 8, 5, BLACK);
+      digitalWrite(HLTSSR, LOW);
       break;
     case 1:
       tft.fillCircle(75, 8, 5, BLACK);
+      digitalWrite(RIMSSSR, LOW);
       break;
     case 2:
       tft.fillCircle(125, 8, 5, BLACK);
+      digitalWrite(BKSSR, LOW);
       BKon = false;
       break;
   }
@@ -333,12 +348,21 @@ void setMode(int modeToSet)
 
 
 void setup(void) {
-  Serial.begin(9600);
-  Serial.print("hello!");
+//  Serial.begin(9600);
+//  Serial.print("hello!");
 
   tft.initR(INITR_BLACKTAB);   // initialize a ST7735S chip, black tab
 
-  Serial.println("init");
+//  Serial.println("init");
+
+  pinMode(HLTSSR, OUTPUT);
+  digitalWrite(HLTSSR, LOW);
+  
+  pinMode(RIMSSSR, OUTPUT);
+  digitalWrite(RIMSSSR, LOW);
+  
+  pinMode(BKSSR, OUTPUT);
+  digitalWrite(BKSSR, LOW);
   
   tft.setRotation(3);
   tft.setTextColor(BLUE, BLACK);
