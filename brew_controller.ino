@@ -1,3 +1,5 @@
+#include "Adafruit_MAX31855.h"
+
 
 #define sclk 13
 #define mosi 11
@@ -9,6 +11,9 @@
 #define thermoCLK 4
 #define HLTthermoCS 5
 #define RIMSthermoCS 6
+
+Adafruit_MAX31855 HLTthermocouple(thermoCLK, HLTthermoCS, thermoDO);
+Adafruit_MAX31855 RIMSthermocouple(thermoCLK, RIMSthermoCS, thermoDO);
 
 #define HLTSSR A0
 #define RIMSSSR A1
@@ -40,12 +45,12 @@ int currentRow = 0;
 int prevCol = 0;
 int prevRow = 0;
 
-int setHLT = 150;
-int setRIMS = 150;
-int setBK = 100;
+double setHLT = 150;
+double setRIMS = 150;
+double setBK = 100;
 
-int currHLT = 150;
-int currRIMS = 151;
+double currHLT = 150;
+double currRIMS = 151;
 
 boolean paused = true;
 int mode = 0;
@@ -267,11 +272,27 @@ void setValue(int col, int row, int value)
         case 0:
           tft.setCursor(10, 55);
           tft.setTextColor(YELLOW, BLACK);
+          if (value < 100)
+          {
+            tft.print(" ");
+          }
+          if (value < 10)
+          {
+            tft.print(" ");
+          }
           tft.print(value);
           break;
         case 1:
           tft.setCursor(60, 55);
           tft.setTextColor(YELLOW,BLACK);
+          if (value < 100)
+          {
+            tft.print(" ");
+          }
+          if (value < 10)
+          {
+            tft.print(" ");
+          }
           tft.print(value);
           break;
       }
@@ -519,6 +540,21 @@ void loop() {
   }
   
   //read in temps here and set value on screen if changed
+  
+  currHLT = HLTthermocouple.readFarenheit();
+  if (isnan(currHLT))
+  {
+    currHLT = 0;
+  }
+  setValue(0, 1, currHLT);
+  
+  currRIMS = RIMSthermocouple.readFarenheit();
+  if (isnan(currRIMS))
+  {
+    currRIMS = 0;
+  }
+  setValue(1, 1, currRIMS);
+
   
   //actual element control goes here
   switch (mode)
