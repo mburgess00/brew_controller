@@ -51,13 +51,17 @@ double setBK = 100;
 
 double currHLT = 150;
 double currRIMS = 151;
+double prevHLT = 0;
+double prevRIMS = 0;
 
 boolean paused = true;
 int mode = 0;
 int prevmode = 0;
 
 const int window = 5000; //Time in milliseconds to calculate duty cycle
+const int tempInterval = 500; //Time in milliseconds to check temps
 long previousMillis = 0;
+long tempPrevMillis = 0;
 boolean BKon = false;
  
 #define Neutral 0
@@ -529,6 +533,7 @@ void handleJoyStick(int stickData)
 }
 
 void loop() {
+  unsigned long currentMillis = millis();
   int joy = CheckJoystick();
   handleJoyStick(joy);
   if (prevRow != currentRow || prevCol != currentCol)
@@ -541,19 +546,31 @@ void loop() {
   
   //read in temps here and set value on screen if changed
   
-  currHLT = HLTthermocouple.readFarenheit();
-  if (isnan(currHLT))
+  if (currentMillis - tempPrevMillis  > (long)tempInterval)
   {
-    currHLT = 0;
+    currHLT = HLTthermocouple.readFarenheit();
+    if (isnan(currHLT))
+    {
+      currHLT = 0;
+    }
+    if (currHLT != prevHLT)
+    {
+      setValue(0, 1, currHLT);
+      prevHLT = currHLT;
+    }
+    
+    currRIMS = RIMSthermocouple.readFarenheit();
+    if (isnan(currRIMS))
+    {
+      currRIMS = 0;
+    }
+    if (currRIMS != prevRIMS)
+    {
+      setValue(1, 1, currRIMS);
+      prevRIMS = currRIMS;
+    }
+    tempPrevMillis = currentMillis;
   }
-  setValue(0, 1, currHLT);
-  
-  currRIMS = RIMSthermocouple.readFarenheit();
-  if (isnan(currRIMS))
-  {
-    currRIMS = 0;
-  }
-  setValue(1, 1, currRIMS);
 
   
   //actual element control goes here
@@ -561,7 +578,7 @@ void loop() {
   {
     case 0:
       //firing the HLT only
-      if ((!paused) && (currHLT < setHLT))
+      if ((!paused) && (currHLT < setHLT) && (currHLT != 0))
       {
         elementOn(0);
       }
@@ -572,7 +589,7 @@ void loop() {
       break;
     case 1:
       //firing HLT and RIMS
-      if ((!paused) && (currRIMS < setRIMS))
+      if ((!paused) && (currRIMS < setRIMS) && (currRIMS != 0))
       {
         //ensure HLT off
         elementOff(0);
@@ -596,7 +613,6 @@ void loop() {
       break;
     case 2:
       //firing BK only
-      unsigned long currentMillis = millis();
       float setBKpct = setBK / 100.0;
       float onDuration = (float)window * setBKpct;
       float offDuration = (float)window - onDuration;   
