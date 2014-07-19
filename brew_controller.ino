@@ -62,7 +62,7 @@ const int window = 5000; //Time in milliseconds to calculate duty cycle
 const int tempInterval = 500; //Time in milliseconds to check temps
 long previousMillis = 0;
 long tempPrevMillis = 0;
-boolean BKon = false;
+//boolean BKon = false;
  
 #define Neutral 0
 #define Press 1
@@ -100,7 +100,7 @@ void elementOn(int element)
     case 2:
       tft.fillCircle(125, 8, 5, RED);
       digitalWrite(BKSSR, HIGH);
-      BKon = true;
+      //BKon = true;
       break;
   }
 }
@@ -121,7 +121,7 @@ void elementOff(int element)
     case 2:
       tft.fillCircle(125, 8, 5, BLACK);
       digitalWrite(BKSSR, LOW);
-      BKon = false;
+      //BKon = false;
       break;
   }
 }
@@ -580,7 +580,10 @@ void loop() {
       //firing the HLT only
       if ((!paused) && (currHLT < setHLT) && (currHLT != 0))
       {
-        elementOn(0);
+        if (digitalRead(HLTSSR) == LOW)
+        {
+          elementOn(0);
+        }
       }
       else
       {
@@ -592,22 +595,37 @@ void loop() {
       if ((!paused) && (currRIMS < setRIMS) && (currRIMS != 0))
       {
         //ensure HLT off
-        elementOff(0);
+        if (digitalRead(HLTSSR) == HIGH)
+        {
+          elementOff(0);
+        }
         //now turn on RIMS
-        elementOn(1);
+        if (digitalRead(RIMSSSR) == LOW)
+        {
+          elementOn(1);
+        }
       }
       else
       {
         //turn off RIMS
-        elementOff(1);
+        if (digitalRead(RIMSSSR) == HIGH)
+        {
+          elementOff(1);
+        }
         //fire HLT?
         if ((!paused) && (currHLT < setHLT))
         {
-          elementOn(0);
+          if (digitalRead(HLTSSR) == LOW)
+          {
+            elementOn(0);
+          }
         }
         else
         {
-          elementOff(0);
+          if (digitalRead(HLTSSR) == HIGH)
+          {
+            elementOff(0);
+          }
         }
       }
       break;
@@ -619,9 +637,10 @@ void loop() {
       
       if (!paused)
       {
-        if (BKon)
+        //if (BKon)
+        if (digitalRead(BKSSR))
         {
-          if (currentMillis - previousMillis > (long)onDuration)
+          if ((currentMillis - previousMillis > (long)onDuration) && (setBK < 100))
           {
             previousMillis = currentMillis;
             elementOff(2);
@@ -641,8 +660,6 @@ void loop() {
   }
   
   
-  //turn off elements regardless of mode
-
   delay(100);
 }
 
