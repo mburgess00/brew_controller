@@ -63,6 +63,11 @@ const int tempInterval = 500; //Time in milliseconds to check temps
 long previousMillis = 0;
 long tempPrevMillis = 0;
 //boolean BKon = false;
+
+float setRIMSpct = 0.50;
+float RIMSwindow = 1.0;
+float RIMSonDuration;
+float RIMSoffDuration;
  
 #define Neutral 0
 #define Press 1
@@ -592,6 +597,9 @@ void loop() {
       break;
     case 1:
       //firing HLT and RIMS
+      RIMSonDuration = RIMSwindow * setRIMSpct;
+      RIMSoffDuration = RIMSwindow - RIMSonDuration;   
+
       if ((!paused) && (currRIMS < setRIMS) && (currRIMS != 0))
       {
         //ensure HLT off
@@ -600,9 +608,25 @@ void loop() {
           elementOff(0);
         }
         //now turn on RIMS
-        if (digitalRead(RIMSSSR) == LOW)
+        if ((digitalRead(RIMSSSR) == LOW) && (currentMillis - previousMillis > RIMSoffDuration))
         {
           elementOn(1);
+        }
+	else
+	{
+          if ((currentMillis - previousMillis > RIMSonDuration) && (currRIMS > (setRIMS - 5)))
+          {
+            elementOff(1);
+
+            //fire HLT?
+            if ((!paused) && (currHLT < setHLT))
+            {
+              if (digitalRead(HLTSSR) == LOW)
+              {
+                elementOn(0);
+              }
+            }
+          }
         }
       }
       else
@@ -632,25 +656,23 @@ void loop() {
     case 2:
       //firing BK only
       float setBKpct = setBK / 100.0;
-      float onDuration = (float)window * setBKpct;
-      float offDuration = (float)window - onDuration;   
+      float BKonDuration = (float)window * setBKpct;
+      float BKoffDuration = (float)window - BKonDuration;   
       
       if (!paused)
       {
         //if (BKon)
         if (digitalRead(BKSSR))
         {
-          if ((currentMillis - previousMillis > (long)onDuration) && (setBK < 100))
+          if ((currentMillis - previousMillis > (long)BKonDuration) && (setBK < 100))
           {
-            previousMillis = currentMillis;
             elementOff(2);
           }
         }
         else
         {
-          if (currentMillis - previousMillis > (long)offDuration)
+          if (currentMillis - previousMillis > (long)BKoffDuration)
           {
-            previousMillis = currentMillis;
             elementOn(2);
           }
         }
@@ -659,7 +681,7 @@ void loop() {
       break;
   }
   
-  
+  previousMillis = currentMillis;
   delay(100);
 }
 
