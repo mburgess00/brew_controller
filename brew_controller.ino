@@ -554,7 +554,7 @@ void loop() {
   if (currentMillis - tempPrevMillis  > (long)tempInterval)
   {
     currHLT = HLTthermocouple.readFarenheit();
-    if (isnan(currHLT))
+    if (isnan(currHLT) | (currHLT < 55) | (currHLT > 220))
     {
       currHLT = 0;
     }
@@ -565,7 +565,7 @@ void loop() {
     }
     
     currRIMS = RIMSthermocouple.readFarenheit();
-    if (isnan(currRIMS))
+    if (isnan(currRIMS) | (currRIMS < 55) | (currRIMS > 220))
     {
       currRIMS = 0;
     }
@@ -608,13 +608,15 @@ void loop() {
           elementOff(0);
         }
         //now turn on RIMS
-        if ((digitalRead(RIMSSSR) == LOW) && (currentMillis - previousMillis > RIMSoffDuration))
+
+        //are we close to target temp?
+        if (currRIMS > (setRIMS - 2))
         {
-          elementOn(1);
-        }
-	else
-	{
-          if ((currentMillis - previousMillis > RIMSonDuration) && (currRIMS > (setRIMS - 5)))
+          if ((digitalRead(RIMSSSR) == LOW) && (currentMillis - previousMillis > RIMSoffDuration))
+          {
+            elementOn(1);
+          }
+          if ((digitalRead(RIMSSSR) == HIGH) && (currentMillis - previousMillis > RIMSonDuration))
           {
             elementOff(1);
 
@@ -626,6 +628,13 @@ void loop() {
                 elementOn(0);
               }
             }
+          }
+        }
+        else
+        {
+          if (digitalRead(RIMSSSR) == LOW)
+          {
+            elementOn(1);
           }
         }
       }
