@@ -62,6 +62,7 @@ const int window = 5000; //Time in milliseconds to calculate duty cycle
 const int tempInterval = 500; //Time in milliseconds to check temps
 long previousMillis = 0;
 long tempPrevMillis = 0;
+long BKPrevMillis = 0;
 //boolean BKon = false;
 
 float setRIMSpct = 0.50;
@@ -668,21 +669,24 @@ void loop() {
       float BKonDuration = (float)window * setBKpct;
       float BKoffDuration = (float)window - BKonDuration;   
       
+      
       if (!paused)
       {
         //if (BKon)
         if (digitalRead(BKSSR))
         {
-          if ((currentMillis - previousMillis > (long)BKonDuration) && (setBK < 100))
+          if ((currentMillis - BKPrevMillis > (long)BKonDuration) && (setBK < 100))
           {
             elementOff(2);
+            BKPrevMillis = currentMillis;
           }
         }
         else
         {
-          if (currentMillis - previousMillis > (long)BKoffDuration)
+          if (currentMillis - BKPrevMillis > (long)BKoffDuration)
           {
             elementOn(2);
+            BKPrevMillis = currentMillis;
           }
         }
       }
