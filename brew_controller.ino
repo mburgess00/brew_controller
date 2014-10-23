@@ -63,6 +63,7 @@ const int tempInterval = 500; //Time in milliseconds to check temps
 long previousMillis = 0;
 long tempPrevMillis = 0;
 long BKPrevMillis = 0;
+long RIMSPrevMillis = 0;
 //boolean BKon = false;
 
 float setRIMSpct = 0.50;
@@ -613,13 +614,15 @@ void loop() {
         //are we close to target temp?
         if (currRIMS > (setRIMS - 2))
         {
-          if ((digitalRead(RIMSSSR) == LOW) && (currentMillis - previousMillis > RIMSoffDuration))
+          if ((digitalRead(RIMSSSR) == LOW) && (currentMillis - RIMSPrevMillis > RIMSoffDuration))
           {
             elementOn(1);
+            RIMSPrevMillis = currentMillis;
           }
-          if ((digitalRead(RIMSSSR) == HIGH) && (currentMillis - previousMillis > RIMSonDuration))
+          if ((digitalRead(RIMSSSR) == HIGH) && (currentMillis - RIMSPrevMillis > RIMSonDuration))
           {
             elementOff(1);
+            RIMSPrevMillis = currentMillis;
 
             //fire HLT?
             if ((!paused) && (currHLT < setHLT))
