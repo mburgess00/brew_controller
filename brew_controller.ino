@@ -66,8 +66,8 @@ long BKPrevMillis = 0;
 long RIMSPrevMillis = 0;
 //boolean BKon = false;
 
-float setRIMSpct = 0.50;
-float RIMSwindow = 1.0;
+float setRIMSpct = 0.25;
+float RIMSwindow = 4.0;
 float RIMSonDuration;
 float RIMSoffDuration;
  
@@ -612,7 +612,7 @@ void loop() {
         //now turn on RIMS
 
         //are we close to target temp?
-        if (currRIMS > (setRIMS - 2))
+        if (currRIMS > (setRIMS - 1))
         {
           if ((digitalRead(RIMSSSR) == LOW) && (currentMillis - RIMSPrevMillis > RIMSoffDuration))
           {
