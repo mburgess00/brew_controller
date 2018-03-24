@@ -26,7 +26,7 @@ def handlepause():
         bkFlame.visible=False
     return
 
-app = App(title="Brew GUI", width=1024, height=768, layout="grid")
+app = App(title="Brew GUI", width=1280, height=768, layout="grid")
 vertPad = Picture(app, image="blank_vert.gif", grid=[0,0])
 
 hltBox = Box(app, layout="grid", grid=[1,0])
@@ -34,7 +34,7 @@ hltPad = Picture(hltBox, image="blank.gif", grid=[0,0])
 hltTitle = Text(hltBox, text="HLT", grid=[0,1], align="top")
 hltText = Text(hltBox, text="180", grid=[0,2], align="top")
 hltSlider = Slider(hltBox, start=212, end=100, horizontal=False, grid=[0,3], align="top")
-hltSlider.tk.config(length=500)
+hltSlider.tk.config(length=500, width=50)
 hltFlamePad = Picture(hltBox, image="blank_flame.gif", grid=[0,4])
 hltFlame = Picture(hltBox, image="flame.gif", grid=[0,4])
 
@@ -43,7 +43,7 @@ rimsPad = Picture(rimsBox, image="blank.gif", grid=[0,0])
 rimsTitle = Text(rimsBox, text="RIMS", grid=[0,1], align="top")
 rimsText = Text(rimsBox, text="180", grid=[0,2], align="top")
 rimsSlider = Slider(rimsBox, start=212, end=100, horizontal=False, grid=[0,3], align="top")
-rimsSlider.tk.config(length=500)
+rimsSlider.tk.config(length=500, width=50)
 rimsFlamePad = Picture(rimsBox, image="blank_flame.gif", grid=[0,4])
 rimsFlame = Picture(rimsBox, image="flame.gif", grid=[0,4])
 
@@ -52,7 +52,7 @@ bkPad = Picture(bkBox, image="blank.gif", grid=[0,0])
 bkTitle = Text(bkBox, text="BK", grid=[0,1], align="top")
 bkText = Text(bkBox, text="75", grid=[0,2], align="top")
 bkSlider = Slider(bkBox, start=100, end=0, horizontal=False, grid=[0,3], align="top")
-bkSlider.tk.config(length=500)
+bkSlider.tk.config(length=500, width=50)
 bkFlamePad = Picture(bkBox, image="blank_flame.gif", grid=[0,4])
 bkFlame = Picture(bkBox, image="flame.gif", grid=[0,4])
 
@@ -62,5 +62,9 @@ modeTitle = Text(modeBox, text="Mode", grid=[0,0], align="top")
 mode = Combo(modeBox, options=["HLT", "RIMS", "BK"], grid=[1,0])
 pauseState = Text(modeBox, text="Paused", grid=[0,1])
 pauseButton = PushButton(modeBox, icon="pause-play.gif", command=handlepause, grid=[1,1])
+
+hltFlame.visible=False
+rimsFlame.visible=False
+bkFlame.visible=False
 
 app.display()
